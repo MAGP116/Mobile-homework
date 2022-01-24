@@ -10,6 +10,7 @@ bool mailClicked = false;
 bool callClicked = false;
 bool ruteClicked = false;
 
+//App
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -20,8 +21,10 @@ class MyApp extends StatelessWidget {
       home: Scaffold(
         body: Column(
           children: [
+            //ITESO image
             Image.network(
                 "https://cruce.iteso.mx/wp-content/uploads/sites/123/2018/04/Portada-2-e1525031912445.jpg"),
+            //Row with university name, address, and like-dislike buttons
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -39,10 +42,12 @@ class MyApp extends StatelessWidget {
                       Text("San Pedro Tlaquepaque, Jalisco")
                     ],
                   ),
+                  //Like dislike and text
                   const ThumbUpDown(),
                 ],
               ),
             ),
+            //mail call and rute buttons
             Padding(
               padding: EdgeInsets.all(32.0),
               child: Row(
@@ -63,6 +68,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+//mail button
 class MailSnackBar extends StatefulWidget {
   const MailSnackBar({Key? key}) : super(key: key);
   @override
@@ -98,6 +104,7 @@ class _MailSnackBarWidgetState extends State<MailSnackBar> {
   }
 }
 
+//call button
 class CallSnackBar extends StatefulWidget {
   const CallSnackBar({Key? key}) : super(key: key);
   @override
@@ -110,14 +117,17 @@ class _CallSnackBarWidgetState extends State<CallSnackBar> {
     return Center(
         child: TextButton(
             onPressed: () {
+              //SnackBar creation and activation
               setState(() {
                 final snackBar = SnackBar(
                     content: const Text("Hacer llamada"),
                     action: SnackBarAction(label: 'close', onPressed: () {}));
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                //changes the color of the call button
                 callClicked = !callClicked;
               });
             },
+            //Icon and text for the button
             child: Column(
               children: [
                 Icon(
@@ -133,6 +143,7 @@ class _CallSnackBarWidgetState extends State<CallSnackBar> {
   }
 }
 
+//rute button
 class RuteSnackBar extends StatefulWidget {
   const RuteSnackBar({Key? key}) : super(key: key);
   @override
@@ -168,6 +179,7 @@ class _RuteSnackBarWidgetState extends State<RuteSnackBar> {
   }
 }
 
+//like-dislike button
 class ThumbUpDown extends StatefulWidget {
   const ThumbUpDown({Key? key}) : super(key: key);
   @override
@@ -195,7 +207,7 @@ class _ThumbUpDownWidgetState extends State<ThumbUpDown> {
             icon: likes.dislikeIcon),
         Text(
           likes.likesVotes.toString(),
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 11,
           ),
         )
