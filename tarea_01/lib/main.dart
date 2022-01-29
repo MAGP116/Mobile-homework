@@ -1,217 +1,178 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(MyApp());
 
-//Variables
-Likes likes = Likes();
-bool mailClicked = false;
-bool callClicked = false;
-bool ruteClicked = false;
-
-//App
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tarea 01',
-      home: Scaffold(
-        body: Column(
-          children: [
-            //ITESO image
-            Image.network(
-                "https://cruce.iteso.mx/wp-content/uploads/sites/123/2018/04/Portada-2-e1525031912445.jpg"),
-            //Row with university name, address, and like-dislike buttons
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  //Column that contains title and subtitle
-                  Column(
-                    children: const [
-                      Text(
-                        "El ITESO: Universidad Jesuita de Guadalajara",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      ),
-                      Text("San Pedro Tlaquepaque, Jalisco")
-                    ],
-                  ),
-                  //Like dislike and text
-                  const ThumbUpDown(),
-                ],
-              ),
-            ),
-            //mail call and rute buttons
-            Padding(
-              padding: EdgeInsets.all(32.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  MailSnackBar(),
-                  CallSnackBar(),
-                  RuteSnackBar()
-                ],
-              ),
-            ),
-            const Text(
-                "El ITESO, Universidad Jesuita de Guadalajara, es una universidad privada ubicada en la Zona Metropolitana de Guadalajara, Jalisco, México, fundada en el año 1957. La institución forma parte del Sistema Universitario Jesuita que integra a ocho universidades en México. ")
-          ],
-        ),
-      ),
+      title: 'Material App',
+      home: HomePage(),
     );
   }
 }
 
-//mail button
-class MailSnackBar extends StatefulWidget {
-  const MailSnackBar({Key? key}) : super(key: key);
+class HomePage extends StatefulWidget {
+  HomePage({
+    Key? key,
+  }) : super(key: key);
+
   @override
-  State<MailSnackBar> createState() => _MailSnackBarWidgetState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MailSnackBarWidgetState extends State<MailSnackBar> {
+class _HomePageState extends State<HomePage> {
+  Likes likes = Likes();
+  bool mailClicked = false;
+  bool callClicked = false;
+  bool ruteClicked = false;
+
   @override
   Widget build(BuildContext context) {
-    return Center(
-        child: TextButton(
-            onPressed: () {
-              setState(() {
-                final snackBar = SnackBar(
-                    content: const Text("Enviar correo"),
-                    action: SnackBarAction(label: 'close', onPressed: () {}));
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                mailClicked = !mailClicked;
-              });
-            },
-            child: Column(
+    //Scaffold indica que se formara una pantalla
+    return Scaffold(
+      // Columna para alinear elementos en vertical (de arriba hacia abajo)
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Para agregar imagenes de una url
+            Image.network(
+              "https://cruce.iteso.mx/wp-content/uploads/sites/123/2018/04/Portada-2-e1525031912445.jpg",
+            ),
+            // Para poner elementos en renglon
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                // el eje main de la Row es horizontal (izq a dch)
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "El ITESO: Universidad Jesuita de Guadalajara",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                        Text("San Pedro Tlaquepaque, Jalisco")
+                      ]),
+
+                  //boton de like
+                  IconButton(
+                    onPressed: () {
+                      likes.upVote();
+                      setState(() {});
+                    },
+                    icon: likes.likeIcon,
+                  ),
+
+                  //Boton de dislike
+                  IconButton(
+                    onPressed: () {
+                      likes.downVote();
+                      setState(() {});
+                    },
+                    icon: likes.dislikeIcon,
+                  ),
+                  Text(likes.likesVotes.toString(),
+                      style: const TextStyle(
+                        fontSize: 11,
+                      )),
+                ],
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Icon(
-                  Icons.mail,
-                  color: (mailClicked) ? Colors.indigo : Colors.black,
-                  size: 48,
+                //EMAIL boton
+                Column(
+                  children: [
+                    IconButton(
+                      iconSize: 64,
+                      color: (mailClicked) ? Colors.indigo : Colors.black,
+                      onPressed: () {
+                        // Muestra un snack bar con texto
+                        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Correo del iteso: correo@iteso.com"),
+                          ),
+                        );
+                        mailClicked = !mailClicked;
+                        setState(() {});
+                      },
+                      icon: Icon(Icons.email),
+                    ),
+                    Text("Email",
+                        style: TextStyle(
+                            color:
+                                (mailClicked) ? Colors.indigo : Colors.black)),
+                  ],
                 ),
-                Text("Correo",
-                    style: TextStyle(
-                        color: (mailClicked) ? Colors.indigo : Colors.black))
-              ],
-            )));
-  }
-}
-
-//call button
-class CallSnackBar extends StatefulWidget {
-  const CallSnackBar({Key? key}) : super(key: key);
-  @override
-  State<CallSnackBar> createState() => _CallSnackBarWidgetState();
-}
-
-class _CallSnackBarWidgetState extends State<CallSnackBar> {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-        child: TextButton(
-            onPressed: () {
-              //SnackBar creation and activation
-              setState(() {
-                final snackBar = SnackBar(
-                    content: const Text("Hacer llamada"),
-                    action: SnackBarAction(label: 'close', onPressed: () {}));
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                //changes the color of the call button
-                callClicked = !callClicked;
-              });
-            },
-            //Icon and text for the button
-            child: Column(
-              children: [
-                Icon(
-                  Icons.call,
-                  color: (callClicked) ? Colors.indigo : Colors.black,
-                  size: 48,
+                //Telefono Boton
+                Column(
+                  children: [
+                    IconButton(
+                      iconSize: 64,
+                      color: (callClicked) ? Colors.indigo : Colors.black,
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("telefono del iteso: 3333333"),
+                          ),
+                        );
+                        callClicked = !callClicked;
+                        setState(() {});
+                      },
+                      icon: Icon(Icons.phone),
+                    ),
+                    Text("Telefono",
+                        style: TextStyle(
+                            color:
+                                (callClicked) ? Colors.indigo : Colors.black)),
+                  ],
                 ),
-                Text("Llamada",
-                    style: TextStyle(
-                        color: (callClicked) ? Colors.indigo : Colors.black))
-              ],
-            )));
-  }
-}
-
-//rute button
-class RuteSnackBar extends StatefulWidget {
-  const RuteSnackBar({Key? key}) : super(key: key);
-  @override
-  State<RuteSnackBar> createState() => _RuteSnackBarWidgetState();
-}
-
-class _RuteSnackBarWidgetState extends State<RuteSnackBar> {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-        child: TextButton(
-            onPressed: () {
-              setState(() {
-                final snackBar = SnackBar(
-                    content: const Text("Ir al ITESO"),
-                    action: SnackBarAction(label: 'close', onPressed: () {}));
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                ruteClicked = !ruteClicked;
-              });
-            },
-            child: Column(
-              children: [
-                Icon(
-                  Icons.directions,
-                  color: (ruteClicked) ? Colors.indigo : Colors.black,
-                  size: 48,
+                //Ruta boton
+                Column(
+                  children: [
+                    IconButton(
+                      iconSize: 64,
+                      color: (ruteClicked) ? Colors.indigo : Colors.black,
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Ruta del iteso"),
+                          ),
+                        );
+                        ruteClicked = !ruteClicked;
+                        setState(() {});
+                      },
+                      icon: Icon(Icons.directions),
+                    ),
+                    Text("Ruta",
+                        style: TextStyle(
+                            color:
+                                (callClicked) ? Colors.indigo : Colors.black)),
+                  ],
                 ),
-                Text("Ruta",
-                    style: TextStyle(
-                        color: (ruteClicked) ? Colors.indigo : Colors.black))
               ],
-            )));
-  }
-}
-
-//like-dislike button
-class ThumbUpDown extends StatefulWidget {
-  const ThumbUpDown({Key? key}) : super(key: key);
-  @override
-  State<ThumbUpDown> createState() => _ThumbUpDownWidgetState();
-}
-
-class _ThumbUpDownWidgetState extends State<ThumbUpDown> {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        IconButton(
-            onPressed: () {
-              setState(() {
-                likes.upVote();
-              });
-            },
-            icon: likes.likeIcon),
-        IconButton(
-            onPressed: () {
-              setState(() {
-                likes.downVote();
-              });
-            },
-            icon: likes.dislikeIcon),
-        Text(
-          likes.likesVotes.toString(),
-          style: const TextStyle(
-            fontSize: 11,
-          ),
-        )
-      ],
+            ),
+            // Para poner padding alrededor de un widget
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                "The university has approximately 10,000 students. Its academic options include Civil Engineering and Architecture, Food Engineering, Education, Electronic Engineering, International Business, International Relations, Chemical Engineering, Philosophy, Psychology and Social Studies, and Networks and Telecommunications Engineering.[2] The university is affiliated to the Jesuit University System, which includes the Iberoamerican Universities in Acapulco, Mexico City, Jaltepec, León, Torreón, Puebla and Tijuana.[3] According to the vision of Jesuits, local businesspeople, and others who planned the university, it would combine professional training with a firm sense of social responsibility.",
+                textAlign: TextAlign.justify,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
