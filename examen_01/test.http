@@ -1,0 +1,10 @@
+
+@host = https://zenquotes.io/api/random
+
+GET {{host}}/
+###
+GET https://picsum.photos/600/1200
+###
+GET https://flagcdn.com/w160/ar.png
+###
+GET http://worldtimeapi.org/api/timezone/America/Mexico_City
