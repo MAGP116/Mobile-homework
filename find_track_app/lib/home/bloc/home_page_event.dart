@@ -21,3 +21,11 @@ class HomePageRemoveSongEvent extends HomePageEvent {
   @override
   List<Object> get props => [song];
 }
+
+class HomePageAddSongEvent extends HomePageEvent {
+  final Map<String, dynamic> data;
+
+  HomePageAddSongEvent(this.data);
+  @override
+  List<Object> get props => [data];
+}

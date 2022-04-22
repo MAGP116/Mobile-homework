@@ -1,9 +1,12 @@
-import 'package:find_track_app/favorites/favorites_page.dart';
 import 'package:find_track_app/home/bloc/home_page_bloc.dart';
 import 'package:find_track_app/login/bloc/auth_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:avatar_glow/avatar_glow.dart';
+
+import 'Song/song_page.dart';
+import 'favorites/favorites_page.dart';
+import 'general_alert_dialog.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({Key? key}) : super(key: key);
@@ -12,25 +15,42 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<HomePageBloc, HomePageState>(
         builder: ((context, state) {
-          if (state is HomePageEmptyState) {
-            return const Home(
-              searching: false,
-              text: 'Toque para escuchar',
-            );
-          }
-          if (state is HomePageSearchingState) {
-            return Home(searching: true, text: "Escuchando...");
-          }
-          if (state is HomePageFavoritesState) {
-            return FavoritesPage(
-              songs: state.data,
-            );
-          }
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }),
-        listener: (context, state) {});
+      if (state is HomePageEmptyState) {
+        return const Home(
+          searching: false,
+          text: 'Tap to listen',
+        );
+      }
+      if (state is HomePageSearchingState) {
+        return Home(searching: true, text: "Listenning...");
+      }
+      if (state is HomePageFavoritesState) {
+        return FavoritesPage(
+          songs: state.data,
+        );
+      }
+      if (state is HomePageFoundState) {
+        return SongPage(data: state.data);
+      }
+      if (state is HomePageErrorState) {
+        return Home(
+          searching: false,
+          text: state.error,
+        );
+      }
+      if (state is HomePageLoadingState) {
+        return const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        );
+      }
+      return Scaffold();
+    }), listener: (context, state) {
+      if (state is HomePageMessageState) {
+        ScaffoldMessenger.of(context)
+          ..removeCurrentSnackBar()
+          ..showSnackBar(SnackBar(content: Text(state.message)));
+      }
+    });
   }
 }
 
@@ -91,40 +111,21 @@ class Home extends StatelessWidget {
                 tooltip: "Log out",
                 onPressed: () => showDialog<String>(
                       context: context,
-                      builder: (BuildContext context) => LogOutAlertDialog(),
+                      builder: (BuildContext context) => GeneralAlertDialog(
+                        title: 'Log Out',
+                        content:
+                            'If you choose to log out you will be redirected to the log In page. Do you want to continue?',
+                        onSubmit: () {
+                          BlocProvider.of<AuthBloc>(context)
+                              .add(SignOutEvent());
+                        },
+                        submit: 'Log Out',
+                      ),
                     ),
                 icon: Icon(Icons.cancel))
           ],
         )
       ],
     ));
-  }
-}
-
-class LogOutAlertDialog extends StatelessWidget {
-  const LogOutAlertDialog({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Log Out'),
-      content: const Text(
-          'If you choose to log out you will be redirected to the log In page. Do you want to continue?'),
-      actions: <Widget>[
-        TextButton(
-          onPressed: () => Navigator.pop(context, 'Cancel'),
-          child: const Text('Cancel'),
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context, 'continue');
-            BlocProvider.of<AuthBloc>(context).add(SignOutEvent());
-          },
-          child: const Text('log out'),
-        ),
-      ],
-    );
   }
 }

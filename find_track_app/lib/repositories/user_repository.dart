@@ -1,7 +1,9 @@
+import 'package:find_track_app/repositories/track_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserRepository {
+  final _trackRep = TrackRepository();
   Future<bool> userRegisterExist() async {
     return (await FirebaseFirestore.instance
             .collection("user")
@@ -29,14 +31,9 @@ class UserRepository {
     List<dynamic> SongsId = res.data()!['favoriteSongs'];
     List<Map<String, dynamic>> ans = [];
     for (var songId in SongsId) {
-      var song = await FirebaseFirestore.instance
-          .collection("track")
-          .doc(songId)
-          .get();
-      if (song.exists) {
-        var t = song.data()!;
-        t['id'] = songId;
-        ans.add(t);
+      var song = await _trackRep.getSong(songId);
+      if (song != null) {
+        ans.add(song);
       }
     }
     return ans;
@@ -56,5 +53,24 @@ class UserRepository {
         .collection("user")
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .update({"favoriteSongs": list});
+  }
+
+  Future<bool> addFavoriteSong(Map<String, dynamic> data) async {
+    var songId = await _trackRep.findOrCreateSong(data);
+    var res = await FirebaseFirestore.instance
+        .collection("user")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get();
+    var songs = res.data()!['favoriteSongs'];
+    if (!songs.contains(songId)) {
+      songs.add(songId);
+      var user = await FirebaseFirestore.instance
+          .collection("user")
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .update({'favoriteSongs': songs});
+      return true;
+    }
+
+    return false;
   }
 }

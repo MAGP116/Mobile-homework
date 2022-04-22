@@ -15,7 +15,14 @@ class HomePageEmptyState extends HomePageState {}
 
 class HomePageSearchingState extends HomePageState {}
 
-class HomePageFoundState extends HomePageState {}
+class HomePageFoundState extends HomePageState {
+  final Map<String, dynamic> data;
+
+  HomePageFoundState({required this.data});
+
+  @override
+  List<Object> get props => [data];
+}
 
 class HomePageFavoritesState extends HomePageState {
   final List<Map<String, dynamic>> data;
@@ -24,4 +31,20 @@ class HomePageFavoritesState extends HomePageState {
 
   @override
   List<Object> get props => [data];
+}
+
+class HomePageErrorState extends HomePageState {
+  final String error;
+
+  HomePageErrorState(this.error);
+  @override
+  List<Object> get props => [error];
+}
+
+class HomePageMessageState extends HomePageState {
+  final String message;
+
+  HomePageMessageState(this.message);
+  @override
+  List<Object> get props => [message];
 }
