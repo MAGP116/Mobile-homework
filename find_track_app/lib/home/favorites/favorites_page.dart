@@ -84,10 +84,16 @@ class SongCard extends StatelessWidget {
                   ),
                   child: Column(
                     children: [
-                      Center(
-                        child: Text(
-                          song["title"],
-                          style: TextStyle(fontSize: 32),
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Center(
+                          child: FittedBox(
+                            fit: BoxFit.fitWidth,
+                            child: Text(
+                              song["title"],
+                              style: TextStyle(fontSize: 32),
+                            ),
+                          ),
                         ),
                       ),
                       Center(
