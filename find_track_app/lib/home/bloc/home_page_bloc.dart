@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:find_track_app/repositories/audd_music_repository.dart';
 import 'package:find_track_app/repositories/user_repository.dart';
 import 'package:find_track_app/secrets/secrets.dart';
 
@@ -16,6 +17,7 @@ part 'home_page_state.dart';
 
 class HomePageBloc extends Bloc<HomePageEvent, HomePageState> {
   final UserRepository _userRepo = UserRepository();
+  final AuddMusicRepository _auddRepo = AuddMusicRepository();
   final record = Record();
   HomePageBloc() : super(HomePageInitial()) {
     on<HomePageToHomeEvent>(_toHome);
@@ -40,21 +42,22 @@ class HomePageBloc extends Bloc<HomePageEvent, HomePageState> {
     emit(HomePageSearchingState());
 
     try {
+      //Find directory path
       final directory = await getApplicationDocumentsDirectory();
-      var path = directory.path;
-      await record.start(path: '$path/audio.m4a');
+      //Record audio
+      await record.start(path: '${directory.path}/audio.m4a');
       await Future.delayed(Duration(seconds: 6));
-      final path2 = await record.stop();
-      final bytes = base64Encode(File(path2!).readAsBytesSync());
-      var request = await http.post(Uri.parse('https://api.audd.io/'), body: {
-        'return': 'apple_music,spotify',
-        'api_token': audioToken,
-        'audio': bytes
-      });
+      final path = await record.stop();
+
+      //Get audio
+      final bytes = base64Encode(File(path!).readAsBytesSync());
+
+      //Find song
+      var request = await _auddRepo.getSong(bytes);
       if (request.statusCode == 200) {
         var data = jsonDecode(request.body);
         if (data["status"] == "success" && data["result"] != null) {
-          //If the request was success and the song was found
+          //If the request was a success and the song was found
           emit(HomePageFoundState(data: {
             'artist': data["result"]['artist'],
             'album': data["result"]['album'],
@@ -68,8 +71,9 @@ class HomePageBloc extends Bloc<HomePageEvent, HomePageState> {
           }));
           return;
         }
-        emit(HomePageErrorState('Song not found'));
       }
+      //If status code != 200 or song not found
+      emit(HomePageErrorState('Song not found'));
     } catch (e) {
       emit(HomePageErrorState(e.toString()));
     }
